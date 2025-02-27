@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jua Nairobi</title>
+    <link rel="stylesheet" href="style2.css">
+
+    <meta property="og:title" content="Jua Nairobi- A Hack Club Athena Event">
+    <meta property="og:description" content="Check out all the projects made by the girls who attended Jua Nairobi!">
+    <meta property="og:image" content="https://cdn.hack.pet/U06EMBJH71S/2.png">
+    <meta property="og:url" content="https://jua.hackclub.com">
+    <meta property="og:type" content="website">
+</head>
+
+<header>
+    <img src="nairobi sticker logo.png" alt="Jua Nairobi Logo" width="500px" class="logo">
+</header>
+
+<body>
+    <h1 class="gallery-title">On the 8th of March, 80 girls from all around Nairobi came together to learn how to code,
+        this is what they built...</h1>
+    <div class="gallery">
+    </div>
+</body>
+
+<script>
+    async function loadProjects() {
+        const response = await fetch('/api/projects');
+        const data = await response.json();
+        const gallery = document.querySelector('.gallery');
+        const projects = data.submissions || data.responses || data;
+        projects.forEach(project => {
+            addToGallery(project, gallery);
+        });
+    }
+
+    function addToGallery(projectData, gallery) {
+        const questions = projectData.questions || [];
+
+        const project = findValue(questions, ['What did you make']);
+        const description = findValue(questions, ['What is a short description of your project']);
+        const name = findValue(questions, ['What Is your name']);
+        const age = findValue(questions, ['How Old are You?']);
+        const image = findValue(questions, ['Image of project']);
+        const projectHTML = `
+                <div class="project">
+                    <img class="project-image" src="${image}">
+                    <div class="project-text">
+                        <p class="project-title">${project}</p>
+                        <p class="project-desc">${description}</p>
+                        <p class="project-author">${name}, ${age}</p>
+                    </div>
+                </div>`;
+        gallery.innerHTML += projectHTML;
+    }
+
+    function findValue(questions, keys) {
+        for (const key of keys) {
+            const byId = questions.find(q => q.id === key);
+            if (byId && byId.value) return byId.value;
+
+            const byName = questions.find(q => q.name === key);
+            if (byName && byName.value) return byName.value;
+        }
+        return '';
+    }
+
+    loadProjects();
+</script>
+
+</html>
